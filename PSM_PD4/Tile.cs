@@ -141,15 +141,15 @@ namespace PSM_PD4
             if (!IsEdgeTemperature(insideTemperature))
                 throw new ArgumentException($"This temperature isn't a edge temperature i:{insideTemperature.i} j:{insideTemperature.j}");
 
-            insideTemperature.Value = ComputeSalesTax(insideTemperature);
+            insideTemperature.Value = ComputeEdgeTemperature(insideTemperature);
             return insideTemperature;
         }
 
-        private int ComputeSalesTax(InsideTemperature insideTemperature) =>
+        private int ComputeEdgeTemperature(InsideTemperature insideTemperature) =>
     insideTemperature switch
     {
         { i: 0 } => _leftSideEdgeTemperatures[0],
-        { j: 41 } => _upsideEdgeTemperatures[0],
+        { j: 41 } => _upsideEdgeTemperatures[0],// to do from TilSize
         { i: 41 } => _rightSideEdgeTemperatures[0],
         { j: 0 } => _downsideEdgeTemperatures[0],
         // other cases removed for brevity...
