@@ -18,6 +18,10 @@ namespace PSM_PD4.Models
             this.Name = name;
             this.Value = Value;
         }
+
+        public void Deconstruct(out int i, out int j) =>
+       (i,j) = (this.i, this.j);
+
         public override bool Equals(object obj) => obj is InsideTemperature insideTemp
             && insideTemp.i == this.i
             && insideTemp.j == this.j;
