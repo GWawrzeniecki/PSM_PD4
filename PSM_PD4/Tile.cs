@@ -78,12 +78,12 @@ namespace PSM_PD4
             }
         }
 
-        public void CalucalateTemperatures()
+        public Equation[] CalucalateTemperatures()
         {
-            BuildEquations();
+           return BuildEquations();
         }
 
-        private void BuildEquations()
+        private Equation[] BuildEquations()
         {
             var allTemperatures = _insideTempertatures
                 .SelectMany(item => item)
@@ -100,6 +100,8 @@ namespace PSM_PD4
                     equationCounter++;
                 }
             }
+
+            return _equations;
         }
 
 
@@ -107,17 +109,26 @@ namespace PSM_PD4
         {
             var valuesFromPattern = FillThePattern(i, j);
             var edgeTemperatures = FindEdgesTemperatures(valuesFromPattern);
-            var nonEdgeTemperatures = valuesFromPattern.Except(edgeTemperatures)
+            var nonEdgeTemperaturesWithvalues = valuesFromPattern
+                                               .Except(edgeTemperatures)
+                                               .ToArray();
+            var finalEquationWithValues = allTemperatures
+                                         .Except(edgeTemperatures)
+                                         .Except(nonEdgeTemperaturesWithvalues);
+            finalEquationWithValues = nonEdgeTemperaturesWithvalues
+                                        .Concat(finalEquationWithValues);
+                                         
+
+            //wrzucil na poczatek
+            var resultValue = edgeTemperatures
+                         .Select(t => t.Value)
+                         .Sum() * -1; // ewuentalnie z i j
+            //var result = new InsideTemperature(i, j, , resultValue);
+
+            var values = finalEquationWithValues
+                .Select(t => t.Value)
                 .ToArray();
-
-            var values = new List<int>();
-
-            var restUnknownTemperatures = allTemperatures
-                .Except(nonEdgeTemperatures);
-
-     
-           
-
+            _equations[equationCounter] = new Equation($"T{i},j{j}", resultValue, values);
 
 
         }
@@ -152,14 +163,10 @@ namespace PSM_PD4
         { j: 41 } => _upsideEdgeTemperatures[0],// to do from TilSize
         { i: 41 } => _rightSideEdgeTemperatures[0],
         { j: 0 } => _downsideEdgeTemperatures[0],
-        // other cases removed for brevity...
         _ => 0
     };
 
-        private void test(int i, int j)
-        {
-
-        }
+       
 
         private InsideTemperature[] FillThePattern(int i, int j)
         {
@@ -169,7 +176,13 @@ namespace PSM_PD4
             result[2] = new InsideTemperature(i - 1, j, $"T{i - 1},{j}", 1);
             result[3] = new InsideTemperature(i, j + 1, $"T{i},{j + 1}", 1);
             result[4] = new InsideTemperature(i, j - 1, $"T{i},{j - 1}", 1);
-            return result;
+            var sortedPattern = result
+                .ToList()
+                .OrderBy(t => t.j)
+                .ThenBy(t => t.i);
+               // .OrderBy(t => t.j);
+            return sortedPattern
+                .ToArray();
         }
     }
 }
