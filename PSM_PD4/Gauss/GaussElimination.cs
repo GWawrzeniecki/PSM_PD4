@@ -9,7 +9,7 @@ namespace PSM_PD4.Gauss
         }
 
         // Solve the system of equations.
-        public static string cmdSolve_Click(int[][] values, int[] results)
+        public static string SolveEquations(int[][] values, int[] results)
         {
             const double tiny = 0.00001;
             string txt = "";
@@ -111,19 +111,19 @@ namespace PSM_PD4.Gauss
                         arr[r, num_cols + 1].ToString();
                 }
 
-                // Verify.
-                txt += "\r\n    Check:";
-                for (int r = 0; r < num_rows; r++)
-                {
-                    double tmp = 0;
-                    for (int c = 0; c < num_cols; c++)
-                    {
-                        tmp += orig_arr[r, c] * arr[c, num_cols + 1];
-                    }
-                    txt += "\r\n" + tmp.ToString();
-                }
+            //    // Verify.
+            //    txt += "\r\n    Check:";
+            //    for (int r = 0; r < num_rows; r++)
+            //    {
+            //        double tmp = 0;
+            //        for (int c = 0; c < num_cols; c++)
+            //        {
+            //            tmp += orig_arr[r, c] * arr[c, num_cols + 1];
+            //        }
+            //        txt += "\r\n" + tmp.ToString();
+            //    }
 
-                txt = txt.Substring("\r\n".Length + 1);
+            //    txt = txt.Substring("\r\n".Length + 1);
             }
 
             return txt;
@@ -133,7 +133,7 @@ namespace PSM_PD4.Gauss
         // Column num_cols holds the result values.
         // Column num_cols + 1 will hold the variables'
         // final values after backsolving.
-        public static double[,] LoadArray(out int num_rows, out int num_cols, int[][] values, int[] results)
+        private static double[,] LoadArray(out int num_rows, out int num_cols, int[][] values, int[] results)
         {
             // Build the augmented matrix.
             //string[] value_rows = results.Split(
