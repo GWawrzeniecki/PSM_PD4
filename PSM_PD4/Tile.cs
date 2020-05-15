@@ -23,12 +23,15 @@ namespace PSM_PD4
         private int[] _downsideEdgeTemperatures;
         private InsideTemperature[][] _allTemperatures;
         private Equation[] _equations;
-        private int GetUnknownTemperaturesAmount => ((TileSize.Width-2) * (TileSize.Height-2));
+        private int GetUnknownTemperaturesAmount => (TileSize.Width-2) * (TileSize.Height-2);
         
-
-
+        
         public Tile(Size tileSize, int leftSideTemperature, int rightSideTemperature, int upsideTemperature, int downsideTemperature)
         {
+
+            if (tileSize.Height != tileSize.Width)
+                throw new ArgumentOutOfRangeException("Only square Tile at the moment");
+
             TileSize = tileSize;
             LeftSideTemperature = leftSideTemperature;
             RightSideTemperature = rightSideTemperature;
@@ -120,10 +123,10 @@ namespace PSM_PD4
         {
             var valuesFromPattern = FillThePattern(i, j);
             var edgeTemperatures = FindEdgesTemperatures(valuesFromPattern);
-            var nonEdgeTemperaturesWithvalues = valuesFromPattern
+            var nonEdgeTemperaturesWithValues = valuesFromPattern
                                                .Except(edgeTemperatures)
                                                .ToArray();
-           var finalEquationWithValues = ReplaceValues(allInsideTemperatures, nonEdgeTemperaturesWithvalues); 
+           var finalEquationWithValues = ReplaceValues(allInsideTemperatures, nonEdgeTemperaturesWithValues); 
             var resultValue = edgeTemperatures
                          .Select(t => t.Value)
                          .Sum() * -1; 
