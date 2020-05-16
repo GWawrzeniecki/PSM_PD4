@@ -88,7 +88,7 @@ namespace PSM_PD4
 
         private Equation[] BuildEquations()
         {
-            var allInsideTemperatures = _allTemperatures
+            var allUnknownsTemperatures = _allTemperatures
                 .SelectMany(item => item)
                 .Where(t => !IsEdgeTemperature(t)) // to do moze jakos optymalniej
                 .ToArray();
@@ -100,33 +100,24 @@ namespace PSM_PD4
                 for (int j = 1; j < _allTemperatures[j].Length - 1; j++)
                 {
                     
-                    BuildEquation(_allTemperatures[i][j].i, _allTemperatures[i][j].j, allInsideTemperatures, equationCounter);
-                    ResetInsideTemperatures(ref allInsideTemperatures);
+                    BuildEquation(_allTemperatures[i][j].i, _allTemperatures[i][j].j, allUnknownsTemperatures, equationCounter);
+                    ResetUnknowsTemperatures(ref allUnknownsTemperatures);
                     equationCounter++;
                 }
             }
 
             return _equations;
         }
+     
 
-        private void ResetInsideTemperatures(ref InsideTemperature[] allInsideTemperatures)
-        
-        {
-            for(int i = 0; i < allInsideTemperatures.Length; i++)
-            {
-                allInsideTemperatures[i].Value = 0;
-            }
-
-        }
-
-        private void BuildEquation(int i, int j, InsideTemperature[] allInsideTemperatures, int equationCounter)
+        private void BuildEquation(int i, int j, InsideTemperature[] allUnknowsTemperatures, int equationCounter)
         {
             var valuesFromPattern = FillThePattern(i, j);
             var edgeTemperatures = FindEdgesTemperatures(valuesFromPattern);
             var nonEdgeTemperaturesWithValues = valuesFromPattern
                                                .Except(edgeTemperatures)
                                                .ToArray();
-           var finalEquationWithValues = ReplaceValues(allInsideTemperatures, nonEdgeTemperaturesWithValues); 
+           var finalEquationWithValues = ReplaceValues(allUnknowsTemperatures, nonEdgeTemperaturesWithValues); 
             var resultValue = edgeTemperatures
                          .Select(t => t.Value)
                          .Sum() * -1; 
@@ -136,18 +127,29 @@ namespace PSM_PD4
             _equations[equationCounter] = new Equation($"T{i},j{j}", resultValue, values);
         }
 
-        private InsideTemperature[] ReplaceValues(InsideTemperature[] allInsideTemperaturesWoValues, InsideTemperature[] insideTemperaturesWithValues)
+
+        private void ResetUnknowsTemperatures(ref InsideTemperature[] allInsideTemperatures)
+
+        {
+            for (int i = 0; i < allInsideTemperatures.Length; i++)
+            {
+                allInsideTemperatures[i].Value = 0;
+            }
+
+        }
+
+        private InsideTemperature[] ReplaceValues(InsideTemperature[] allUnknowsTemperatures, InsideTemperature[] nonEdgeTemperaturesWithValues)
         {
                                  
-            foreach(var temp in insideTemperaturesWithValues)
+            foreach(var temp in nonEdgeTemperaturesWithValues)
             {
-               var index = allInsideTemperaturesWoValues
+               var index = allUnknowsTemperatures
                     .ToList()
                     .FindIndex(t => t.i == temp.i && t.j == temp.j);
-                allInsideTemperaturesWoValues[index] = temp;
+                allUnknowsTemperatures[index] = temp;
 
             }
-            return allInsideTemperaturesWoValues
+            return allUnknowsTemperatures
                 .ToArray();                    
         }
 
